@@ -59,6 +59,10 @@ module.exports = function (input) {
     output.baseUriParameters = sanitizeParameters(input.baseUriParameters);
   }
 
+  if (is.array(input.securedBy)) {
+    output.securedBy = sanitizeSecuredBy(input.securedBy);
+  }
+
   if (is.array(input.documentation)) {
     output.documentation = sanitizeDocumentation(input.documentation);
   }
@@ -77,10 +81,6 @@ module.exports = function (input) {
 
   if (is.array(input.traits)) {
     output.traits = sanitizeTraits(input.traits);
-  }
-
-  if (is.array(input.securedBy)) {
-    output.securedBy = sanitizeSecuredBy(input.securedBy);
   }
 
   if (is.array(input.resources)) {
@@ -258,6 +258,7 @@ var extend             = require('xtend/mutable');
 var is                 = require('../utils/is');
 var sanitizeTrait      = require('./trait');
 var sanitizeParameters = require('./parameters');
+var sanitizeSecuredBy       = require('./secured-by');
 
 /**
  * Sanitize a method into RAML structure for stringification.
@@ -305,6 +306,10 @@ module.exports = function sanitizeResources (resources) {
       child.type = resource.type;
     }
 
+    if (is.array(resource.securedBy)) {
+      child.securedBy = sanitizeSecuredBy(resource.securedBy);
+    }
+
     if (is.array(resource.is)) {
       child.is = resource.is;
     }
@@ -325,7 +330,7 @@ module.exports = function sanitizeResources (resources) {
   return obj;
 };
 
-},{"../utils/is":13,"./parameters":3,"./trait":10,"xtend/mutable":22}],6:[function(require,module,exports){
+},{"../utils/is":13,"./parameters":3,"./secured-by":8,"./trait":10,"xtend/mutable":22}],6:[function(require,module,exports){
 /**
  * Sanitize the responses object.
  *
@@ -654,6 +659,11 @@ var requiresQuotes = function (str) {
     return true;
   }
 
+  // Check if it is an include
+  if (str.substring(0, '!include'.length) === '!include') {
+      return false;
+  }
+
   // Check whether it's surrounded by spaces or starts with `-` or `?`.
   if (/^[ \-?]| $/.test(str) || NUMBER_REGEXP.test(str)) {
     return true;
@@ -960,7 +970,7 @@ module.exports = function (input, opts) {
   }, opts));
 };
 
-},{"./utils/is":13,"indent-string":14,"repeat-string":18,"string-length":19,"xtend/mutable":22}],13:[function(require,module,exports){
+},{"./utils/is":13,"indent-string":15,"repeat-string":18,"string-length":20,"xtend/mutable":22}],13:[function(require,module,exports){
 var is        = exports;
 var _toString = Object.prototype.toString;
 
@@ -1008,6 +1018,12 @@ is.primitive = function (value) {
 
 },{}],14:[function(require,module,exports){
 'use strict';
+module.exports = function () {
+	return /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
+};
+
+},{}],15:[function(require,module,exports){
+'use strict';
 var repeating = require('repeating');
 
 module.exports = function (str, indent, count) {
@@ -1028,33 +1044,7 @@ module.exports = function (str, indent, count) {
 	return str.replace(/^(?!\s*$)/mg, indent);
 };
 
-},{"repeating":15}],15:[function(require,module,exports){
-'use strict';
-var isFinite = require('is-finite');
-
-module.exports = function (str, n) {
-	if (typeof str !== 'string') {
-		throw new TypeError('Expected `input` to be a string');
-	}
-
-	if (n < 0 || !isFinite(n)) {
-		throw new TypeError('Expected `count` to be a positive finite number');
-	}
-
-	var ret = '';
-
-	do {
-		if (n & 1) {
-			ret += str;
-		}
-
-		str += str;
-	} while ((n >>= 1));
-
-	return ret;
-};
-
-},{"is-finite":16}],16:[function(require,module,exports){
+},{"repeating":19}],16:[function(require,module,exports){
 'use strict';
 var numberIsNan = require('number-is-nan');
 
@@ -1077,6 +1067,13 @@ module.exports = Number.isNaN || function (x) {
  */
 
 'use strict';
+
+/**
+ * Results cache
+ */
+
+var res = '';
+var cache;
 
 /**
  * Expose `repeat`
@@ -1104,9 +1101,10 @@ module.exports = repeat;
 
 function repeat(str, num) {
   if (typeof str !== 'string') {
-    throw new TypeError('repeat-string expects a string.');
+    throw new TypeError('expected a string');
   }
 
+  // cover common, quick use cases
   if (num === 1) return str;
   if (num === 2) return str + str;
 
@@ -1114,29 +1112,51 @@ function repeat(str, num) {
   if (cache !== str || typeof cache === 'undefined') {
     cache = str;
     res = '';
+  } else if (res.length >= max) {
+    return res.substr(0, max);
   }
 
-  while (max > res.length && num > 0) {
+  while (max > res.length && num > 1) {
     if (num & 1) {
       res += str;
     }
 
     num >>= 1;
-    if (!num) break;
     str += str;
   }
 
-  return res.substr(0, max);
+  res += str;
+  res = res.substr(0, max);
+  return res;
 }
 
-/**
- * Results cache
- */
-
-var res = '';
-var cache;
-
 },{}],19:[function(require,module,exports){
+'use strict';
+var isFinite = require('is-finite');
+
+module.exports = function (str, n) {
+	if (typeof str !== 'string') {
+		throw new TypeError('Expected `input` to be a string');
+	}
+
+	if (n < 0 || !isFinite(n)) {
+		throw new TypeError('Expected `count` to be a positive finite number');
+	}
+
+	var ret = '';
+
+	do {
+		if (n & 1) {
+			ret += str;
+		}
+
+		str += str;
+	} while ((n >>= 1));
+
+	return ret;
+};
+
+},{"is-finite":16}],20:[function(require,module,exports){
 'use strict';
 var stripAnsi = require('strip-ansi');
 
@@ -1146,7 +1166,7 @@ module.exports = function (str) {
 	return stripAnsi(str).replace(reAstral, ' ').length;
 };
 
-},{"strip-ansi":20}],20:[function(require,module,exports){
+},{"strip-ansi":21}],21:[function(require,module,exports){
 'use strict';
 var ansiRegex = require('ansi-regex')();
 
@@ -1154,21 +1174,17 @@ module.exports = function (str) {
 	return typeof str === 'string' ? str.replace(ansiRegex, '') : str;
 };
 
-},{"ansi-regex":21}],21:[function(require,module,exports){
-'use strict';
-module.exports = function () {
-	return /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
-};
-
-},{}],22:[function(require,module,exports){
+},{"ansi-regex":14}],22:[function(require,module,exports){
 module.exports = extend
+
+var hasOwnProperty = Object.prototype.hasOwnProperty;
 
 function extend(target) {
     for (var i = 1; i < arguments.length; i++) {
         var source = arguments[i]
 
         for (var key in source) {
-            if (source.hasOwnProperty(key)) {
+            if (hasOwnProperty.call(source, key)) {
                 target[key] = source[key]
             }
         }
