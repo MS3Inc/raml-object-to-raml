@@ -293,17 +293,13 @@ module.exports = function sanitizeResources (resources) {
 
   resources.forEach(function (resource) {
     var child = obj;
-
-    if (is.string(resource.displayName)) {
-      child.displayName = resource.displayName;
-    }
-
+    
     if (resource.relativeUri) {
       child = obj[resource.relativeUri] = obj[resource.relativeUri] || {};
     }
 
-    if (resource.uriParameters) {
-      child.uriParameters = sanitizeParameters(resource.uriParameters);
+    if (is.string(resource.displayName)) {
+      child.displayName = resource.displayName;
     }
 
     if (is.string(resource.type) || is.object(resource.type)) {
@@ -320,6 +316,10 @@ module.exports = function sanitizeResources (resources) {
 
     if (is.string(resource.description)) {
       child.description = resource.description;
+    }
+
+    if (resource.uriParameters) {
+      child.uriParameters = sanitizeParameters(resource.uriParameters);
     }
 
     if (is.array(resource.methods)) {
