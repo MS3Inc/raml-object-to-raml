@@ -18,7 +18,7 @@ module.exports = function (documentation) {
   });
 };
 
-},{"../utils/is":13}],2:[function(require,module,exports){
+},{"../utils/is":14}],2:[function(require,module,exports){
 var extend                  = require('xtend/mutable');
 var is                      = require('../utils/is');
 var sanitizeSchemas         = require('./schemas');
@@ -29,6 +29,7 @@ var sanitizeResources       = require('./resources');
 var sanitizeResourceTypes   = require('./resource-types');
 var sanitizeTraits          = require('./traits');
 var sanitizeSecuredBy       = require('./secured-by');
+var sanitizeProtocols       = require('./protocols');
 
 /**
  * Transform a RAML object into a YAML compatible structure.
@@ -75,6 +76,10 @@ module.exports = function (input) {
     output.schemas = sanitizeSchemas(input.schemas);
   }
 
+  if (is.array(input.protocols)) {
+    output.protocols = sanitizeProtocols(input.protocols);
+  }
+
   if (is.array(input.resourceTypes)) {
     output.resourceTypes = sanitizeResourceTypes(input.resourceTypes);
   }
@@ -90,7 +95,7 @@ module.exports = function (input) {
   return output;
 };
 
-},{"../utils/is":13,"./documentation":1,"./parameters":3,"./resource-types":4,"./resources":5,"./schemas":7,"./secured-by":8,"./security-schemes":9,"./traits":11,"xtend/mutable":22}],3:[function(require,module,exports){
+},{"../utils/is":14,"./documentation":1,"./parameters":3,"./protocols":4,"./resource-types":5,"./resources":6,"./schemas":8,"./secured-by":9,"./security-schemes":10,"./traits":12,"xtend/mutable":23}],3:[function(require,module,exports){
 var extend = require('xtend/mutable');
 var is     = require('../utils/is');
 
@@ -196,7 +201,22 @@ module.exports = function (params) {
   return obj;
 };
 
-},{"../utils/is":13,"xtend/mutable":22}],4:[function(require,module,exports){
+},{"../utils/is":14,"xtend/mutable":23}],4:[function(require,module,exports){
+var is = require('../utils/is');
+
+/**
+ * Sanitize protocols.
+ *
+ * @param  {Array} protocols
+ * @return {Array}
+ */
+module.exports = function (protocols) {
+    return protocols.filter(function (value) {
+        return is.string(value) && ~['HTTP', 'HTTPS'].indexOf(value);
+    });
+}
+
+},{"../utils/is":14}],5:[function(require,module,exports){
 var is            = require('../utils/is');
 var sanitizeTrait = require('./trait');
 
@@ -253,7 +273,7 @@ module.exports = function (resourceTypes) {
   return array;
 };
 
-},{"../utils/is":13,"./trait":10}],5:[function(require,module,exports){
+},{"../utils/is":14,"./trait":11}],6:[function(require,module,exports){
 var extend             = require('xtend/mutable');
 var is                 = require('../utils/is');
 var sanitizeTrait      = require('./trait');
@@ -334,7 +354,7 @@ module.exports = function sanitizeResources (resources) {
   return obj;
 };
 
-},{"../utils/is":13,"./parameters":3,"./secured-by":8,"./trait":10,"xtend/mutable":22}],6:[function(require,module,exports){
+},{"../utils/is":14,"./parameters":3,"./secured-by":9,"./trait":11,"xtend/mutable":23}],7:[function(require,module,exports){
 /**
  * Sanitize the responses object.
  *
@@ -355,7 +375,7 @@ module.exports = function (responses) {
   return obj;
 };
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var is = require('../utils/is');
 
 /**
@@ -385,7 +405,7 @@ module.exports = function (schemas) {
   return array;
 };
 
-},{"../utils/is":13}],8:[function(require,module,exports){
+},{"../utils/is":14}],9:[function(require,module,exports){
 var is = require('../utils/is');
 
 /**
@@ -400,7 +420,7 @@ module.exports = function (securedBy) {
   });
 }
 
-},{"../utils/is":13}],9:[function(require,module,exports){
+},{"../utils/is":14}],10:[function(require,module,exports){
 var is            = require('../utils/is');
 var sanitizeTrait = require('./trait');
 
@@ -455,7 +475,7 @@ module.exports = function (securitySchemes) {
   return array;
 };
 
-},{"../utils/is":13,"./trait":10}],10:[function(require,module,exports){
+},{"../utils/is":14,"./trait":11}],11:[function(require,module,exports){
 var is                 = require('../utils/is');
 var sanitizeResponses  = require('./responses');
 var sanitizeParameters = require('./parameters');
@@ -501,7 +521,7 @@ module.exports = function (trait) {
   return obj;
 };
 
-},{"../utils/is":13,"./parameters":3,"./responses":6,"./secured-by":8}],11:[function(require,module,exports){
+},{"../utils/is":14,"./parameters":3,"./responses":7,"./secured-by":9}],12:[function(require,module,exports){
 var sanitizeTrait = require('./trait');
 
 /**
@@ -526,7 +546,7 @@ module.exports = function (traits) {
   return array;
 };
 
-},{"./trait":10}],12:[function(require,module,exports){
+},{"./trait":11}],13:[function(require,module,exports){
 var extend   = require('xtend/mutable');
 var indent   = require('indent-string');
 var repeat   = require('repeat-string');
@@ -974,7 +994,7 @@ module.exports = function (input, opts) {
   }, opts));
 };
 
-},{"./utils/is":13,"indent-string":15,"repeat-string":18,"string-length":20,"xtend/mutable":22}],13:[function(require,module,exports){
+},{"./utils/is":14,"indent-string":16,"repeat-string":19,"string-length":21,"xtend/mutable":23}],14:[function(require,module,exports){
 var is        = exports;
 var _toString = Object.prototype.toString;
 
@@ -1020,13 +1040,13 @@ is.primitive = function (value) {
   return !!PRIMITIVES[_toString.call(value)];
 }
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 module.exports = function () {
 	return /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
 };
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 var repeating = require('repeating');
 
@@ -1048,7 +1068,7 @@ module.exports = function (str, indent, count) {
 	return str.replace(/^(?!\s*$)/mg, indent);
 };
 
-},{"repeating":19}],16:[function(require,module,exports){
+},{"repeating":20}],17:[function(require,module,exports){
 'use strict';
 var numberIsNan = require('number-is-nan');
 
@@ -1056,13 +1076,13 @@ module.exports = Number.isFinite || function (val) {
 	return !(typeof val !== 'number' || numberIsNan(val) || val === Infinity || val === -Infinity);
 };
 
-},{"number-is-nan":17}],17:[function(require,module,exports){
+},{"number-is-nan":18}],18:[function(require,module,exports){
 'use strict';
 module.exports = Number.isNaN || function (x) {
 	return x !== x;
 };
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /*!
  * repeat-string <https://github.com/jonschlinkert/repeat-string>
  *
@@ -1134,7 +1154,7 @@ function repeat(str, num) {
   return res;
 }
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 var isFinite = require('is-finite');
 
@@ -1160,7 +1180,7 @@ module.exports = function (str, n) {
 	return ret;
 };
 
-},{"is-finite":16}],20:[function(require,module,exports){
+},{"is-finite":17}],21:[function(require,module,exports){
 'use strict';
 var stripAnsi = require('strip-ansi');
 
@@ -1170,7 +1190,7 @@ module.exports = function (str) {
 	return stripAnsi(str).replace(reAstral, ' ').length;
 };
 
-},{"strip-ansi":21}],21:[function(require,module,exports){
+},{"strip-ansi":22}],22:[function(require,module,exports){
 'use strict';
 var ansiRegex = require('ansi-regex')();
 
@@ -1178,7 +1198,7 @@ module.exports = function (str) {
 	return typeof str === 'string' ? str.replace(ansiRegex, '') : str;
 };
 
-},{"ansi-regex":14}],22:[function(require,module,exports){
+},{"ansi-regex":15}],23:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -1197,7 +1217,7 @@ function extend(target) {
     return target
 }
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 var sanitize  = require('./lib/sanitize');
 var stringify = require('./lib/stringify');
 
@@ -1211,5 +1231,5 @@ module.exports = function (obj) {
   return '#%RAML 0.8\n' + stringify(sanitize(obj));
 };
 
-},{"./lib/sanitize":2,"./lib/stringify":12}]},{},[23])(23)
+},{"./lib/sanitize":2,"./lib/stringify":13}]},{},[24])(24)
 });
