@@ -70,6 +70,28 @@ describe('raml object to raml', function () {
       ].join('\n'));
     });
 
+    it('protocols', function () {
+      var str = toRAML({
+        protocols: ["HTTP", "HTTPS"]
+      });
+
+      expect(str).to.equal([
+        RAML_PREFIX,
+        'protocols: [ HTTP, HTTPS ]'
+      ].join('\n'));
+    });
+
+    it('protocols is case-insensitive and accepts only HTTP and/or HTTPS', function () {
+      var str = toRAML({
+        protocols: ["HTTP", "https", "WSS"]
+      });
+
+      expect(str).to.equal([
+        RAML_PREFIX,
+        'protocols: [ HTTP ]'
+      ].join('\n'));
+    });
+
     it('security schemes', function () {
       var str = toRAML({
         securitySchemes: [{
