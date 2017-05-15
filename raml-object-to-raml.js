@@ -10,7 +10,7 @@ var stringify = require('./lib/stringify');
  */
 module.exports = function (obj, param) {
   if (param) {
-    return '#%RAML 1.0\n' + stringify(sanitize(obj));
+    return '#%RAML 1.0\n' + stringify(sanitize(obj, param));
   }
   return '#%RAML 0.8\n' + stringify(sanitize(obj));
 };

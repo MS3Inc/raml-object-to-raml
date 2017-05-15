@@ -5,6 +5,7 @@ var toRAML = require('../');
 
 describe('raml object to raml', function () {
   var RAML_PREFIX = '#%RAML 0.8';
+  var RAML_PREFIX2 = '#%RAML 1.0';
 
   describe('base parameters', function () {
     it('title', function () {
@@ -279,6 +280,28 @@ describe('raml object to raml', function () {
         '          enum: [ open, closed ]',
         '          default: open'
       ].join('\n'));
+    });
+
+    it('types', function(){
+      var str = toRAML({
+        types: [{
+          name: "testType",
+          type: "file",
+          description: "description for type",
+          format: "rfc2616",
+          fileTypes: ["1", "2"],
+        }]
+      }, true);
+
+      expect(str).to.equal([
+        RAML_PREFIX2,
+        'types:',
+        '  testType:',
+        '    type: file',
+        '    description: description for type',
+        '    format: rfc2616',
+        '    fileTypes: [ "1", "2" ]',
+      ].join('\n'))
     });
 
     it('resources', function () {

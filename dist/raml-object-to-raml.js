@@ -1,4 +1,66 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.ramlObjectToRaml = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var is                 = require('../utils/is');
+var sanitizeResponses  = require('./responses');
+var sanitizeParameters = require('./parameters');
+var sanitizeSecuredBy  = require('./secured-by');
+
+/**
+ * Sanitize a dataTypes-like object.
+ *
+ * @param  {Object} dataTypes
+ * @return {Object}
+ */
+module.exports = function (dataTypes) {
+  var obj = {};
+
+  for(var i=0, length = dataTypes.length; i < length; i++) {
+    var dataType = dataTypes[i]
+    var typeName = dataType.name;
+    var parseDataType = {};
+
+    if (is.string(dataType.type)) {
+      parseDataType.type = dataType.type;
+    }
+
+    if (is.string(dataType.description)) {
+      parseDataType.description = dataType.description;
+    }
+
+    if (is.string(dataType.format)) {
+      parseDataType.format = dataType.format;
+    }
+
+    if (is.number(dataType.minLength)) {
+      parseDataType.minLength = dataType.minLength;
+    }
+
+    if (is.number(dataType.maxLength)) {
+      parseDataType.maxLength = dataType.maxLength;
+    }
+
+    if (is.number(dataType.minimum)) {
+      parseDataType.minimum = dataType.minimum;
+    }
+
+    if (is.number(dataType.maximum)) {
+      parseDataType.maximum = dataType.maximum;
+    }
+
+    if (is.array(dataType.enum)) {
+      parseDataType.enum = dataType.enum;
+    }
+
+    if (is.array(dataType.fileTypes)) {
+      parseDataType.fileTypes = dataType.fileTypes;
+    }
+
+    obj[typeName] = parseDataType;
+  }
+
+  return obj;
+};
+
+},{"../utils/is":15,"./parameters":4,"./responses":8,"./secured-by":10}],2:[function(require,module,exports){
 var is = require('../utils/is');
 
 /**
@@ -18,7 +80,7 @@ module.exports = function (documentation) {
   });
 };
 
-},{"../utils/is":14}],2:[function(require,module,exports){
+},{"../utils/is":15}],3:[function(require,module,exports){
 var extend                  = require('xtend/mutable');
 var is                      = require('../utils/is');
 var sanitizeSchemas         = require('./schemas');
@@ -30,14 +92,16 @@ var sanitizeResourceTypes   = require('./resource-types');
 var sanitizeTraits          = require('./traits');
 var sanitizeSecuredBy       = require('./secured-by');
 var sanitizeProtocols       = require('./protocols');
+var sanitizeDataTypes       = require('./data-types')
 
 /**
  * Transform a RAML object into a YAML compatible structure.
  *
  * @param  {Object} input
+ * @param  {String} Param
  * @return {Object}
  */
-module.exports = function (input) {
+module.exports = function (input, Param) {
   var output = {};
 
   if (is.string(input.title)) {
@@ -68,6 +132,12 @@ module.exports = function (input) {
     output.documentation = sanitizeDocumentation(input.documentation);
   }
 
+  if (Param) {
+    if (is.array(input.types)) {
+      output.types = sanitizeDataTypes(input.types);
+    }
+  }
+
   if (is.array(input.securitySchemes)) {
     output.securitySchemes = sanitizeSecuritySchemes(input.securitySchemes);
   }
@@ -95,7 +165,7 @@ module.exports = function (input) {
   return output;
 };
 
-},{"../utils/is":14,"./documentation":1,"./parameters":3,"./protocols":4,"./resource-types":5,"./resources":6,"./schemas":8,"./secured-by":9,"./security-schemes":10,"./traits":12,"xtend/mutable":23}],3:[function(require,module,exports){
+},{"../utils/is":15,"./data-types":1,"./documentation":2,"./parameters":4,"./protocols":5,"./resource-types":6,"./resources":7,"./schemas":9,"./secured-by":10,"./security-schemes":11,"./traits":13,"xtend/mutable":24}],4:[function(require,module,exports){
 var extend = require('xtend/mutable');
 var is     = require('../utils/is');
 
@@ -201,7 +271,7 @@ module.exports = function (params) {
   return obj;
 };
 
-},{"../utils/is":14,"xtend/mutable":23}],4:[function(require,module,exports){
+},{"../utils/is":15,"xtend/mutable":24}],5:[function(require,module,exports){
 var is = require('../utils/is');
 
 /**
@@ -216,7 +286,7 @@ module.exports = function (protocols) {
     });
 }
 
-},{"../utils/is":14}],5:[function(require,module,exports){
+},{"../utils/is":15}],6:[function(require,module,exports){
 var is            = require('../utils/is');
 var sanitizeTrait = require('./trait');
 
@@ -273,7 +343,7 @@ module.exports = function (resourceTypes) {
   return array;
 };
 
-},{"../utils/is":14,"./trait":11}],6:[function(require,module,exports){
+},{"../utils/is":15,"./trait":12}],7:[function(require,module,exports){
 var extend             = require('xtend/mutable');
 var is                 = require('../utils/is');
 var sanitizeTrait      = require('./trait');
@@ -354,7 +424,7 @@ module.exports = function sanitizeResources (resources) {
   return obj;
 };
 
-},{"../utils/is":14,"./parameters":3,"./secured-by":9,"./trait":11,"xtend/mutable":23}],7:[function(require,module,exports){
+},{"../utils/is":15,"./parameters":4,"./secured-by":10,"./trait":12,"xtend/mutable":24}],8:[function(require,module,exports){
 /**
  * Sanitize the responses object.
  *
@@ -375,7 +445,7 @@ module.exports = function (responses) {
   return obj;
 };
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var is = require('../utils/is');
 
 /**
@@ -405,7 +475,7 @@ module.exports = function (schemas) {
   return array;
 };
 
-},{"../utils/is":14}],9:[function(require,module,exports){
+},{"../utils/is":15}],10:[function(require,module,exports){
 var is = require('../utils/is');
 
 /**
@@ -420,7 +490,7 @@ module.exports = function (securedBy) {
   });
 }
 
-},{"../utils/is":14}],10:[function(require,module,exports){
+},{"../utils/is":15}],11:[function(require,module,exports){
 var is            = require('../utils/is');
 var sanitizeTrait = require('./trait');
 
@@ -475,7 +545,7 @@ module.exports = function (securitySchemes) {
   return array;
 };
 
-},{"../utils/is":14,"./trait":11}],11:[function(require,module,exports){
+},{"../utils/is":15,"./trait":12}],12:[function(require,module,exports){
 var is                 = require('../utils/is');
 var sanitizeResponses  = require('./responses');
 var sanitizeParameters = require('./parameters');
@@ -521,7 +591,7 @@ module.exports = function (trait) {
   return obj;
 };
 
-},{"../utils/is":14,"./parameters":3,"./responses":7,"./secured-by":9}],12:[function(require,module,exports){
+},{"../utils/is":15,"./parameters":4,"./responses":8,"./secured-by":10}],13:[function(require,module,exports){
 var sanitizeTrait = require('./trait');
 
 /**
@@ -546,7 +616,7 @@ module.exports = function (traits) {
   return array;
 };
 
-},{"./trait":11}],13:[function(require,module,exports){
+},{"./trait":12}],14:[function(require,module,exports){
 var extend   = require('xtend/mutable');
 var indent   = require('indent-string');
 var repeat   = require('repeat-string');
@@ -994,7 +1064,7 @@ module.exports = function (input, opts) {
   }, opts));
 };
 
-},{"./utils/is":14,"indent-string":16,"repeat-string":19,"string-length":21,"xtend/mutable":23}],14:[function(require,module,exports){
+},{"./utils/is":15,"indent-string":17,"repeat-string":20,"string-length":22,"xtend/mutable":24}],15:[function(require,module,exports){
 var is        = exports;
 var _toString = Object.prototype.toString;
 
@@ -1040,13 +1110,13 @@ is.primitive = function (value) {
   return !!PRIMITIVES[_toString.call(value)];
 }
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 module.exports = function () {
-	return /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
+	return /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-PRZcf-nqry=><]/g;
 };
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict';
 var repeating = require('repeating');
 
@@ -1068,7 +1138,7 @@ module.exports = function (str, indent, count) {
 	return str.replace(/^(?!\s*$)/mg, indent);
 };
 
-},{"repeating":20}],17:[function(require,module,exports){
+},{"repeating":21}],18:[function(require,module,exports){
 'use strict';
 var numberIsNan = require('number-is-nan');
 
@@ -1076,13 +1146,13 @@ module.exports = Number.isFinite || function (val) {
 	return !(typeof val !== 'number' || numberIsNan(val) || val === Infinity || val === -Infinity);
 };
 
-},{"number-is-nan":18}],18:[function(require,module,exports){
+},{"number-is-nan":19}],19:[function(require,module,exports){
 'use strict';
 module.exports = Number.isNaN || function (x) {
 	return x !== x;
 };
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /*!
  * repeat-string <https://github.com/jonschlinkert/repeat-string>
  *
@@ -1154,7 +1224,7 @@ function repeat(str, num) {
   return res;
 }
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 var isFinite = require('is-finite');
 
@@ -1180,7 +1250,7 @@ module.exports = function (str, n) {
 	return ret;
 };
 
-},{"is-finite":17}],21:[function(require,module,exports){
+},{"is-finite":18}],22:[function(require,module,exports){
 'use strict';
 var stripAnsi = require('strip-ansi');
 
@@ -1190,7 +1260,7 @@ module.exports = function (str) {
 	return stripAnsi(str).replace(reAstral, ' ').length;
 };
 
-},{"strip-ansi":22}],22:[function(require,module,exports){
+},{"strip-ansi":23}],23:[function(require,module,exports){
 'use strict';
 var ansiRegex = require('ansi-regex')();
 
@@ -1198,7 +1268,7 @@ module.exports = function (str) {
 	return typeof str === 'string' ? str.replace(ansiRegex, '') : str;
 };
 
-},{"ansi-regex":15}],23:[function(require,module,exports){
+},{"ansi-regex":16}],24:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -1217,7 +1287,7 @@ function extend(target) {
     return target
 }
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var sanitize  = require('./lib/sanitize');
 var stringify = require('./lib/stringify');
 
@@ -1225,11 +1295,15 @@ var stringify = require('./lib/stringify');
  * Transform a RAML object into a RAML string.
  *
  * @param  {Object} obj
+ * @param {String} param
  * @return {String}
  */
-module.exports = function (obj) {
+module.exports = function (obj, param) {
+  if (param) {
+    return '#%RAML 1.0\n' + stringify(sanitize(obj, param));
+  }
   return '#%RAML 0.8\n' + stringify(sanitize(obj));
 };
 
-},{"./lib/sanitize":2,"./lib/stringify":13}]},{},[24])(24)
+},{"./lib/sanitize":3,"./lib/stringify":14}]},{},[25])(25)
 });
