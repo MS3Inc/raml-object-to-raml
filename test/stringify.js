@@ -304,6 +304,63 @@ describe('raml object to raml', function () {
       ].join('\n'))
     });
 
+    it('types nested Array', function(){
+      var str = toRAML({
+        types: [
+          {
+            "type": "array",
+            "uniqueItems": "on",
+            "example": "1",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "uniqueItems": "on",
+              "example": "2",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "name": "nested",
+                "description": "description",
+                "maxLength": 33,
+                "minLength": 33,
+                "default": "3",
+                "example": "3",
+                "pattern": "3",
+                "type": "string",
+                "enum": [
+                  "enum"
+                ]
+              }
+            }
+          }
+        ]
+      }, true);
+
+      expect(str).to.equal([
+        RAML_PREFIX2,
+        'types:',
+        '  nested:',
+        '    type: array',
+        '    uniqueItems: true',
+        '    minItems: 1',
+        '    maxItems: 1',
+        '    items:',
+        '      type: array',
+        '      uniqueItems: true',
+        '      minItems: 2',
+        '      maxItems: 2',
+        '      items:',
+        '        type: string',
+        '        description: description',
+        '        minLength: 33',
+        '        maxLength: 33',
+        '        default: "3"',
+        '        pattern: "3"',
+        '        enum: [ enum ]',
+      ].join('\n'))
+    });
+
     it('resources', function () {
       var str = toRAML({
         resources: [{
