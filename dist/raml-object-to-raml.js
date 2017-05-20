@@ -86,7 +86,7 @@ module.exports = function (dataTypes) {
     }
     parsedData.items = {};
     if (data.type != 'array') {
-      parsedData.type = 'array'
+      parsedData.type = 'array';
       parsePrimitive(parsedData.items, data.items, params);
     } else {
       parseTypeArray(parsedData.items, data.items, params)
@@ -109,7 +109,15 @@ module.exports = function (dataTypes) {
       }
       parseDataType.items = {};
       var params = {};
-      parseTypeArray(parseDataType.items, dataType.items, params);
+      if (dataType.items && !dataType.items.items) {
+        var items = {}
+        params.name = dataType.items.name;
+        parsePrimitive(items, dataType.items);
+        parsePrimitive(parseDataType, dataType);
+        parseDataType.items = items;
+      } else {
+        parseTypeArray(parseDataType.items, dataType.items, params);
+      }
       obj[params.name] = parseDataType;
     } else {
       parsePrimitive(parseDataType, dataType);
