@@ -284,80 +284,59 @@ describe('raml object to raml', function () {
 
     it('types', function(){
       var str = toRAML({
-        types: [{
-          name: "testType",
-          type: "file",
-          description: "description for type",
-          format: "rfc2616",
-          fileTypes: ["1", "2"],
-        }]
+        types: [{"name":"Objecis","description":"Object description","example":"example Object","type":"object","properties":{"Property1":{"description":"property DEscription","maxLength":1,"minLength":1,"default":"1","example":"1","pattern":"1","type":"string","enum":["1Enum"]},"prop2":{"description":"description Prop2","minItems":88,"maxItems":88,"example":"example array","type":"array","unique":true,"items":{"minItems":99,"maxItems":99,"example":"examplearr2","type":"array","unique":false,"items":{"maximum":4,"minimum":4,"default":"numDefault","example":"nestedObjectExample","type":"object","format":"int64","enum":["enum1"],"properties":{"my1":{"description":"description","maxLength":1,"minLength":1,"default":"1","example":"1","pattern":"1","type":"string","enum":["enum1"]}}}}}}}]
+
       }, true);
 
       expect(str).to.equal([
         RAML_PREFIX2,
         'types:',
-        '  testType:',
-        '    type: file',
-        '    description: description for type',
-        '    format: rfc2616',
-        '    fileTypes: [ "1", "2" ]',
-      ].join('\n'))
-    });
-
-    it('types nested Array', function(){
-      var str = toRAML({
-        types: [
-          {
-            "type": "array",
-            "uniqueItems": "on",
-            "example": "1",
-            "minItems": 1,
-            "maxItems": 1,
-            "items": {
-              "type": "string",
-              "uniqueItems": "on",
-              "example": "2",
-              "minItems": 2,
-              "maxItems": 2,
-              "items": {
-                "name": "nested",
-                "description": "description",
-                "maxLength": 33,
-                "minLength": 33,
-                "default": "3",
-                "example": "3",
-                "pattern": "3",
-                "type": "string",
-                "enum": [
-                  "enum"
-                ]
-              }
-            }
-          }
-        ]
-      }, true);
-
-      expect(str).to.equal([
-        RAML_PREFIX2,
-        'types:',
-        '  nested:',
-        '    type: array',
-        '    uniqueItems: true',
-        '    minItems: 1',
-        '    maxItems: 1',
-        '    items:',
-        '      type: array',
-        '      uniqueItems: true',
-        '      minItems: 2',
-        '      maxItems: 2',
-        '      items:',
+        '  Objecis:',
+        '    description: Object description',
+        '    example: example Object',
+        '    type: object',
+        '    properties:',
+        '      Property1:',
+        '        description: property DEscription',
+        '        maxLength: 1',
+        '        minLength: 1',
+        '        default: "1"',
+        '        example: "1"',
+        '        pattern: "1"',
         '        type: string',
-        '        description: description',
-        '        minLength: 33',
-        '        maxLength: 33',
-        '        default: "3"',
-        '        pattern: "3"',
-        '        enum: [ enum ]',
+        '        enum: [ 1Enum ]',
+        '      prop2:',
+        '        description: description Prop2',
+        '        minItems: 88',
+        '        maxItems: 88',
+        '        example: example array',
+        '        type: array',
+        '        unique: true',
+        '        items:',
+        '          minItems: 99',
+        '          maxItems: 99',
+        '          example: examplearr2',
+        '          type: array',
+        '          unique: false',
+        '          items:',
+        '            maximum: 4',
+        '            minimum: 4',
+        '            default: numDefault',
+        '            example: nestedObjectExample',
+        '            type: object',
+        '            format: int64',
+        '            enum: [ enum1 ]',
+        '            properties:',
+        '              my1:',
+        '                description: description',
+        '                maxLength: 1',
+        '                minLength: 1',
+        '                default: "1"',
+        '                example: "1"',
+        '                pattern: "1"',
+        '                type: string',
+        '                enum: [ enum1 ]',
+
       ].join('\n'))
     });
 
