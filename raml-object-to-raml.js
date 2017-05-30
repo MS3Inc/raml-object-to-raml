@@ -10,7 +10,8 @@ var stringify = require('./lib/stringify');
  */
 module.exports = function (obj, context) {
   if (!context) {
-    context.version = 0.8;
+    var context = {}
+    context.version = "0.8";
     return '#%RAML 0.8\n' + stringify(sanitize(obj, context));
   } else if (context && context.version == '1.0') {
       return '#%RAML 1.0\n' + stringify(sanitize(obj, context));
