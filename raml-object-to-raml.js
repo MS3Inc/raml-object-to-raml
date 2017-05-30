@@ -8,9 +8,11 @@ var stringify = require('./lib/stringify');
  * @param {String} param
  * @return {String}
  */
-module.exports = function (obj, param) {
-  if (param) {
-    return '#%RAML 1.0\n' + stringify(sanitize(obj, param));
+module.exports = function (obj, context) {
+  if (!context) {
+    context.version = 0.8;
+    return '#%RAML 0.8\n' + stringify(sanitize(obj, context));
+  } else if (context && context.version == '1.0') {
+      return '#%RAML 1.0\n' + stringify(sanitize(obj, context));
   }
-  return '#%RAML 0.8\n' + stringify(sanitize(obj));
 };

@@ -11,7 +11,7 @@ var sanitizeSecuredBy  = require('./secured-by');
  * @return {Object}
  */
 
-module.exports = function (dataTypes) {
+module.exports = function (dataTypes, context) {
   var obj = {};
   for(var i=0, length = dataTypes.length; i < length; i++) {
     var dataType = dataTypes[i]
@@ -32,7 +32,7 @@ var is = require('../utils/is');
  * @param  {Array} documentation
  * @return {Array}
  */
-module.exports = function (documentation) {
+module.exports = function (documentation, context) {
   return documentation.filter(function (document) {
     return is.string(document.title) && is.string(document.content);
   }).map(function (document) {
@@ -64,7 +64,7 @@ var sanitizeDataTypes       = require('./data-types')
  * @param  {String} Param
  * @return {Object}
  */
-module.exports = function (input, Param) {
+module.exports = function (input, context) {
   var output = {};
 
   if (is.string(input.title)) {
@@ -84,45 +84,45 @@ module.exports = function (input, Param) {
   }
 
   if (is.object(input.baseUriParameters)) {
-    output.baseUriParameters = sanitizeParameters(input.baseUriParameters);
+    output.baseUriParameters = sanitizeParameters(input.baseUriParameters, context);
   }
 
   if (is.array(input.securedBy)) {
-    output.securedBy = sanitizeSecuredBy(input.securedBy);
+    output.securedBy = sanitizeSecuredBy(input.securedBy, context);
   }
 
   if (is.array(input.documentation)) {
-    output.documentation = sanitizeDocumentation(input.documentation);
+    output.documentation = sanitizeDocumentation(input.documentation, context);
   }
 
-  if (Param) {
+  if (context.version == '1.0') {
     if (is.array(input.types)) {
-      output.types = sanitizeDataTypes(input.types);
+      output.types = sanitizeDataTypes(input.types, context);
     }
   }
 
   if (is.array(input.securitySchemes)) {
-    output.securitySchemes = sanitizeSecuritySchemes(input.securitySchemes);
+    output.securitySchemes = sanitizeSecuritySchemes(input.securitySchemes, context);
   }
 
   if (is.array(input.schemas)) {
-    output.schemas = sanitizeSchemas(input.schemas);
+    output.schemas = sanitizeSchemas(input.schemas, context);
   }
 
   if (is.array(input.protocols)) {
-    output.protocols = sanitizeProtocols(input.protocols);
+    output.protocols = sanitizeProtocols(input.protocols, context);
   }
 
   if (is.array(input.resourceTypes)) {
-    output.resourceTypes = sanitizeResourceTypes(input.resourceTypes);
+    output.resourceTypes = sanitizeResourceTypes(input.resourceTypes, context);
   }
 
   if (is.array(input.traits)) {
-    output.traits = sanitizeTraits(input.traits);
+    output.traits = sanitizeTraits(input.traits, context);
   }
 
   if (is.array(input.resources)) {
-    extend(output, sanitizeResources(input.resources));
+    extend(output, sanitizeResources(input.resources, context));
   }
 
   return output;
@@ -218,7 +218,7 @@ var sanitizeParameter = function (param, key) {
  * @param  {Object} params
  * @return {Object}
  */
-module.exports = function (params) {
+module.exports = function (params, context) {
   var obj = {};
 
   Object.keys(params).forEach(function (key) {
@@ -243,7 +243,7 @@ var is = require('../utils/is');
  * @param  {Array} protocols
  * @return {Array}
  */
-module.exports = function (protocols) {
+module.exports = function (protocols, context) {
     return protocols.filter(function (value) {
         return is.string(value) && ~['HTTP', 'HTTPS'].indexOf(value);
     });
@@ -276,7 +276,7 @@ var METHOD_KEY_REGEXP = /^(?:GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS)\??$/i;
  * @param  {Array} resourceTypes
  * @return {Array}
  */
-module.exports = function (resourceTypes) {
+module.exports = function (resourceTypes, context) {
   var array = [];
 
   resourceTypes.forEach(function (resourceTypeMap) {
@@ -290,7 +290,7 @@ module.exports = function (resourceTypes) {
         var keys  = ['type', 'usage', 'description'];
 
         if (METHOD_KEY_REGEXP.test(key)) {
-          child[key] = value == null ? value : sanitizeTrait(value);
+          child[key] = value == null ? value : sanitizeTrait(value, context);
         }
 
         // Allow usage and description strings alongside methods.
@@ -341,12 +341,12 @@ var sanitizeMethods = function (methods) {
  * @param  {Array}  resources
  * @return {Object}
  */
-module.exports = function sanitizeResources (resources) {
+module.exports = function sanitizeResources (resources, context) {
   var obj = {};
 
   resources.forEach(function (resource) {
     var child = obj;
-    
+
     if (resource.relativeUri) {
       child = obj[resource.relativeUri] = obj[resource.relativeUri] || {};
     }
@@ -360,7 +360,7 @@ module.exports = function sanitizeResources (resources) {
     }
 
     if (is.array(resource.securedBy)) {
-      child.securedBy = sanitizeSecuredBy(resource.securedBy);
+      child.securedBy = sanitizeSecuredBy(resource.securedBy, context);
     }
 
     if (is.array(resource.is)) {
@@ -372,15 +372,15 @@ module.exports = function sanitizeResources (resources) {
     }
 
     if (resource.uriParameters) {
-      child.uriParameters = sanitizeParameters(resource.uriParameters);
+      child.uriParameters = sanitizeParameters(resource.uriParameters, context);
     }
 
     if (is.array(resource.methods)) {
-      extend(child, sanitizeMethods(resource.methods));
+      extend(child, sanitizeMethods(resource.methods, context));
     }
 
     if (is.array(resource.resources)) {
-      extend(child, sanitizeResources(resource.resources));
+      extend(child, sanitizeResources(resource.resources, context));
     }
   });
 
@@ -394,7 +394,7 @@ module.exports = function sanitizeResources (resources) {
  * @param  {Object} responses
  * @return {Object}
  */
-module.exports = function (responses) {
+module.exports = function (responses, context) {
   var obj = {};
 
   Object.keys(responses).forEach(function (code) {
@@ -417,7 +417,7 @@ var is = require('../utils/is');
  * @param  {Array} schemas
  * @return {Array}
  */
-module.exports = function (schemas) {
+module.exports = function (schemas, context) {
   var array = [];
 
   // Iterate over the schema array and object and make it one schema per index.
@@ -447,7 +447,7 @@ var is = require('../utils/is');
  * @param  {Array} securedBy
  * @return {Array}
  */
-module.exports = function (securedBy) {
+module.exports = function (securedBy, context) {
   return securedBy.filter(function (value) {
     return is.null(value) || is.object(value) || is.string(value);
   });
@@ -475,7 +475,7 @@ var AUTH_TYPES = {
  * @param  {Array} securitySchemes
  * @return {Array}
  */
-module.exports = function (securitySchemes) {
+module.exports = function (securitySchemes, context) {
   var array = [];
 
   securitySchemes.forEach(function (schemeMap) {
@@ -494,7 +494,7 @@ module.exports = function (securitySchemes) {
       }
 
       if (is.object(scheme.describedBy)) {
-        data.describedBy = sanitizeTrait(scheme.describedBy);
+        data.describedBy = sanitizeTrait(scheme.describedBy, context);
       }
 
       if (is.object(scheme.settings)) {
@@ -520,7 +520,7 @@ var sanitizeSecuredBy  = require('./secured-by');
  * @param  {Object} trait
  * @return {Object}
  */
-module.exports = function (trait) {
+module.exports = function (trait, context) {
   var obj = {};
 
   if (is.string(trait.usage)) {
@@ -532,11 +532,11 @@ module.exports = function (trait) {
   }
 
   if (is.object(trait.headers)) {
-    obj.headers = sanitizeParameters(trait.headers);
+    obj.headers = sanitizeParameters(trait.headers, context);
   }
 
   if (is.object(trait.queryParameters)) {
-    obj.queryParameters = sanitizeParameters(trait.queryParameters);
+    obj.queryParameters = sanitizeParameters(trait.queryParameters, context);
   }
 
   if (is.object(trait.body)) {
@@ -544,11 +544,11 @@ module.exports = function (trait) {
   }
 
   if (is.object(trait.responses)) {
-    obj.responses = sanitizeResponses(trait.responses);
+    obj.responses = sanitizeResponses(trait.responses, context);
   }
 
   if (is.array(trait.securedBy)) {
-    obj.securedBy = sanitizeSecuredBy(trait.securedBy)
+    obj.securedBy = sanitizeSecuredBy(trait.securedBy, context)
   }
 
   return obj;
@@ -563,7 +563,7 @@ var sanitizeTrait = require('./trait');
  * @param  {Array} traits
  * @return {Array}
  */
-module.exports = function (traits) {
+module.exports = function (traits, context) {
   var array = [];
 
   traits.forEach(function (traitMap) {
@@ -1261,11 +1261,14 @@ var stringify = require('./lib/stringify');
  * @param {String} param
  * @return {String}
  */
-module.exports = function (obj, param) {
-  if (param) {
-    return '#%RAML 1.0\n' + stringify(sanitize(obj, param));
+module.exports = function (obj, context) {
+  if (!context) {
+    var context = {}
+    context.version = "0.8";
+    return '#%RAML 0.8\n' + stringify(sanitize(obj, context));
+  } else if (context && context.version == '1.0') {
+      return '#%RAML 1.0\n' + stringify(sanitize(obj, context));
   }
-  return '#%RAML 0.8\n' + stringify(sanitize(obj));
 };
 
 },{"./lib/sanitize":3,"./lib/stringify":14}]},{},[25])(25)
