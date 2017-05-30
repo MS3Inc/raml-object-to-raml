@@ -1262,13 +1262,11 @@ var stringify = require('./lib/stringify');
  * @return {String}
  */
 module.exports = function (obj, context) {
-  if (!context) {
-    var context = {}
-    context.version = "0.8";
-    return '#%RAML 0.8\n' + stringify(sanitize(obj, context));
-  } else if (context && context.version == '1.0') {
-      return '#%RAML 1.0\n' + stringify(sanitize(obj, context));
+  if (!context || !context.version) {
+     var context = {}
+     context.version = "0.8";
   }
+  return '#%RAML ' + context.version + '\n' + stringify(sanitize(obj, context));
 };
 
 },{"./lib/sanitize":3,"./lib/stringify":14}]},{},[25])(25)
