@@ -5,6 +5,7 @@ var toRAML = require('../');
 
 describe('raml object to raml', function () {
   var RAML_PREFIX = '#%RAML 0.8';
+  var RAML_PREFIX10 = '#%RAML 1.0';
 
   describe('base parameters', function () {
     it('title', function () {
@@ -279,6 +280,64 @@ describe('raml object to raml', function () {
         '          enum: [ open, closed ]',
         '          default: open'
       ].join('\n'));
+    });
+
+    it('Data types', function(){
+      var str = toRAML({
+        types: [{"name":"Objecis","description":"Object description","example":"example Object","type":"object","properties":{"Property1":{"description":"property DEscription","maxLength":1,"minLength":1,"default":"1","example":"1","pattern":"1","type":"string","enum":["1Enum"]},"prop2":{"description":"description Prop2","minItems":88,"maxItems":88,"example":"example array","type":"array","unique":true,"items":{"minItems":99,"maxItems":99,"example":"examplearr2","type":"array","unique":false,"items":{"maximum":4,"minimum":4,"default":"numDefault","example":"nestedObjectExample","type":"object","format":"int64","enum":["enum1"],"properties":{"my1":{"description":"description","maxLength":1,"minLength":1,"default":"1","example":"1","pattern":"1","type":"string","enum":["enum1"]}}}}}}}]
+
+      }, {version: '1.0'});
+
+      expect(str).to.equal([
+        RAML_PREFIX10,
+        'types:',
+        '  Objecis:',
+        '    description: Object description',
+        '    example: example Object',
+        '    type: object',
+        '    properties:',
+        '      Property1:',
+        '        description: property DEscription',
+        '        maxLength: 1',
+        '        minLength: 1',
+        '        default: "1"',
+        '        example: "1"',
+        '        pattern: "1"',
+        '        type: string',
+        '        enum: [ 1Enum ]',
+        '      prop2:',
+        '        description: description Prop2',
+        '        minItems: 88',
+        '        maxItems: 88',
+        '        example: example array',
+        '        type: array',
+        '        unique: true',
+        '        items:',
+        '          minItems: 99',
+        '          maxItems: 99',
+        '          example: examplearr2',
+        '          type: array',
+        '          unique: false',
+        '          items:',
+        '            maximum: 4',
+        '            minimum: 4',
+        '            default: numDefault',
+        '            example: nestedObjectExample',
+        '            type: object',
+        '            format: int64',
+        '            enum: [ enum1 ]',
+        '            properties:',
+        '              my1:',
+        '                description: description',
+        '                maxLength: 1',
+        '                minLength: 1',
+        '                default: "1"',
+        '                example: "1"',
+        '                pattern: "1"',
+        '                type: string',
+        '                enum: [ enum1 ]',
+
+      ].join('\n'))
     });
 
     it('resources', function () {
