@@ -609,6 +609,7 @@ module.exports = function (trait, context) {
 
 },{"../utils/is":17,"./parameters":5,"./responses":9,"./secured-by":11}],15:[function(require,module,exports){
 var sanitizeTrait = require('./trait');
+var sanitizeSelectedAnnotations = require('./selected-annotations');
 
 /**
  * Sanitize traits into an array of keyed maps.
@@ -625,6 +626,10 @@ module.exports = function (traits, context) {
 
       obj[key] = sanitizeTrait(traitMap[key]);
 
+      if(context.version == '1.0' && traitMap[key].selectedAnnotations && traitMap[key].selectedAnnotations.length){
+        sanitizeSelectedAnnotations(traitMap[key].selectedAnnotations, obj[key]);
+      }
+
       array.push(obj);
     });
   });
@@ -632,7 +637,7 @@ module.exports = function (traits, context) {
   return array;
 };
 
-},{"./trait":14}],16:[function(require,module,exports){
+},{"./selected-annotations":13,"./trait":14}],16:[function(require,module,exports){
 var extend   = require('xtend/mutable');
 var indent   = require('indent-string');
 var repeat   = require('repeat-string');
