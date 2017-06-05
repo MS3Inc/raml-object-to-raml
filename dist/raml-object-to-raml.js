@@ -44,7 +44,7 @@ module.exports = function (dataTypes, context) {
   return obj;
 };
 
-},{"../utils/is":16,"./parameters":5,"./responses":9,"./secured-by":11}],3:[function(require,module,exports){
+},{"../utils/is":17,"./parameters":5,"./responses":9,"./secured-by":11}],3:[function(require,module,exports){
 var is = require('../utils/is');
 
 /**
@@ -64,7 +64,7 @@ module.exports = function (documentation, context) {
   });
 };
 
-},{"../utils/is":16}],4:[function(require,module,exports){
+},{"../utils/is":17}],4:[function(require,module,exports){
 var extend                  = require('xtend/mutable');
 var is                      = require('../utils/is');
 var sanitizeSchemas         = require('./schemas');
@@ -76,8 +76,9 @@ var sanitizeResourceTypes   = require('./resource-types');
 var sanitizeTraits          = require('./traits');
 var sanitizeSecuredBy       = require('./secured-by');
 var sanitizeProtocols       = require('./protocols');
-var sanitizeDataTypes       = require('./data-types')
-var sanitizeAnnotationTypes = require('./annotation-types')
+var sanitizeDataTypes       = require('./data-types');
+var sanitizeAnnotationTypes = require('./annotation-types');
+var sanitizeSelectedAnnotations = require('./selected-annotations')
 
 /**
  * Transform a RAML object into a YAML compatible structure.
@@ -103,6 +104,10 @@ module.exports = function (input, context) {
 
   if (is.string(input.baseUri)) {
     output.baseUri = input.baseUri;
+  }
+
+  if(context.version == '1.0' && input.selectedAnnotations && input.selectedAnnotations.length){
+    sanitizeSelectedAnnotations(input.selectedAnnotations, output);
   }
 
   if (is.object(input.baseUriParameters)) {
@@ -156,7 +161,7 @@ module.exports = function (input, context) {
   return output;
 };
 
-},{"../utils/is":16,"./annotation-types":1,"./data-types":2,"./documentation":3,"./parameters":5,"./protocols":6,"./resource-types":7,"./resources":8,"./schemas":10,"./secured-by":11,"./security-schemes":12,"./traits":14,"xtend/mutable":25}],5:[function(require,module,exports){
+},{"../utils/is":17,"./annotation-types":1,"./data-types":2,"./documentation":3,"./parameters":5,"./protocols":6,"./resource-types":7,"./resources":8,"./schemas":10,"./secured-by":11,"./security-schemes":12,"./selected-annotations":13,"./traits":15,"xtend/mutable":26}],5:[function(require,module,exports){
 var extend = require('xtend/mutable');
 var is     = require('../utils/is');
 
@@ -262,7 +267,7 @@ module.exports = function (params, context) {
   return obj;
 };
 
-},{"../utils/is":16,"xtend/mutable":25}],6:[function(require,module,exports){
+},{"../utils/is":17,"xtend/mutable":26}],6:[function(require,module,exports){
 var is = require('../utils/is');
 
 /**
@@ -277,7 +282,7 @@ module.exports = function (protocols, context) {
     });
 }
 
-},{"../utils/is":16}],7:[function(require,module,exports){
+},{"../utils/is":17}],7:[function(require,module,exports){
 var is            = require('../utils/is');
 var sanitizeTrait = require('./trait');
 
@@ -334,7 +339,7 @@ module.exports = function (resourceTypes, context) {
   return array;
 };
 
-},{"../utils/is":16,"./trait":13}],8:[function(require,module,exports){
+},{"../utils/is":17,"./trait":14}],8:[function(require,module,exports){
 var extend             = require('xtend/mutable');
 var is                 = require('../utils/is');
 var sanitizeTrait      = require('./trait');
@@ -415,7 +420,7 @@ module.exports = function sanitizeResources (resources, context) {
   return obj;
 };
 
-},{"../utils/is":16,"./parameters":5,"./secured-by":11,"./trait":13,"xtend/mutable":25}],9:[function(require,module,exports){
+},{"../utils/is":17,"./parameters":5,"./secured-by":11,"./trait":14,"xtend/mutable":26}],9:[function(require,module,exports){
 /**
  * Sanitize the responses object.
  *
@@ -466,7 +471,7 @@ module.exports = function (schemas, context) {
   return array;
 };
 
-},{"../utils/is":16}],11:[function(require,module,exports){
+},{"../utils/is":17}],11:[function(require,module,exports){
 var is = require('../utils/is');
 
 /**
@@ -481,7 +486,7 @@ module.exports = function (securedBy, context) {
   });
 }
 
-},{"../utils/is":16}],12:[function(require,module,exports){
+},{"../utils/is":17}],12:[function(require,module,exports){
 var is            = require('../utils/is');
 var sanitizeTrait = require('./trait');
 
@@ -536,7 +541,22 @@ module.exports = function (securitySchemes, context) {
   return array;
 };
 
-},{"../utils/is":16,"./trait":13}],13:[function(require,module,exports){
+},{"../utils/is":17,"./trait":14}],13:[function(require,module,exports){
+/**
+ * Sanitize a annotationTypes-like object.
+ *
+ * @param  {Object} annotationTypes
+ * @return {Object}
+ */
+
+module.exports = function (annotationTypes, target) {
+  annotationTypes.forEach(function(type) {
+      var name = '('+ Object.keys(type)[0] + ')';
+      target[name] = type[Object.keys(type)[0]];
+  }, this);
+};
+
+},{}],14:[function(require,module,exports){
 var is                 = require('../utils/is');
 var sanitizeResponses  = require('./responses');
 var sanitizeParameters = require('./parameters');
@@ -582,7 +602,7 @@ module.exports = function (trait, context) {
   return obj;
 };
 
-},{"../utils/is":16,"./parameters":5,"./responses":9,"./secured-by":11}],14:[function(require,module,exports){
+},{"../utils/is":17,"./parameters":5,"./responses":9,"./secured-by":11}],15:[function(require,module,exports){
 var sanitizeTrait = require('./trait');
 
 /**
@@ -607,7 +627,7 @@ module.exports = function (traits, context) {
   return array;
 };
 
-},{"./trait":13}],15:[function(require,module,exports){
+},{"./trait":14}],16:[function(require,module,exports){
 var extend   = require('xtend/mutable');
 var indent   = require('indent-string');
 var repeat   = require('repeat-string');
@@ -1055,7 +1075,7 @@ module.exports = function (input, opts) {
   }, opts));
 };
 
-},{"./utils/is":16,"indent-string":18,"repeat-string":21,"string-length":23,"xtend/mutable":25}],16:[function(require,module,exports){
+},{"./utils/is":17,"indent-string":19,"repeat-string":22,"string-length":24,"xtend/mutable":26}],17:[function(require,module,exports){
 var is        = exports;
 var _toString = Object.prototype.toString;
 
@@ -1101,13 +1121,13 @@ is.primitive = function (value) {
   return !!PRIMITIVES[_toString.call(value)];
 }
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 module.exports = function () {
 	return /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-PRZcf-nqry=><]/g;
 };
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
 var repeating = require('repeating');
 
@@ -1129,7 +1149,7 @@ module.exports = function (str, indent, count) {
 	return str.replace(/^(?!\s*$)/mg, indent);
 };
 
-},{"repeating":22}],19:[function(require,module,exports){
+},{"repeating":23}],20:[function(require,module,exports){
 'use strict';
 var numberIsNan = require('number-is-nan');
 
@@ -1137,13 +1157,13 @@ module.exports = Number.isFinite || function (val) {
 	return !(typeof val !== 'number' || numberIsNan(val) || val === Infinity || val === -Infinity);
 };
 
-},{"number-is-nan":20}],20:[function(require,module,exports){
+},{"number-is-nan":21}],21:[function(require,module,exports){
 'use strict';
 module.exports = Number.isNaN || function (x) {
 	return x !== x;
 };
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /*!
  * repeat-string <https://github.com/jonschlinkert/repeat-string>
  *
@@ -1215,7 +1235,7 @@ function repeat(str, num) {
   return res;
 }
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 var isFinite = require('is-finite');
 
@@ -1241,7 +1261,7 @@ module.exports = function (str, n) {
 	return ret;
 };
 
-},{"is-finite":19}],23:[function(require,module,exports){
+},{"is-finite":20}],24:[function(require,module,exports){
 'use strict';
 var stripAnsi = require('strip-ansi');
 
@@ -1251,7 +1271,7 @@ module.exports = function (str) {
 	return stripAnsi(str).replace(reAstral, ' ').length;
 };
 
-},{"strip-ansi":24}],24:[function(require,module,exports){
+},{"strip-ansi":25}],25:[function(require,module,exports){
 'use strict';
 var ansiRegex = require('ansi-regex')();
 
@@ -1259,7 +1279,7 @@ module.exports = function (str) {
 	return typeof str === 'string' ? str.replace(ansiRegex, '') : str;
 };
 
-},{"ansi-regex":17}],25:[function(require,module,exports){
+},{"ansi-regex":18}],26:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -1278,7 +1298,7 @@ function extend(target) {
     return target
 }
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 var sanitize  = require('./lib/sanitize');
 var stringify = require('./lib/stringify');
 
@@ -1297,5 +1317,5 @@ module.exports = function (obj, context) {
   return '#%RAML ' + context.version + '\n' + stringify(sanitize(obj, context));
 };
 
-},{"./lib/sanitize":4,"./lib/stringify":15}]},{},[26])(26)
+},{"./lib/sanitize":4,"./lib/stringify":16}]},{},[27])(27)
 });
