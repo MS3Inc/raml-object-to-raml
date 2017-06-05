@@ -345,6 +345,7 @@ var is                 = require('../utils/is');
 var sanitizeTrait      = require('./trait');
 var sanitizeParameters = require('./parameters');
 var sanitizeSecuredBy       = require('./secured-by');
+var sanitizeSelectedAnnotations = require('./selected-annotations');
 
 /**
  * Sanitize a method into RAML structure for stringification.
@@ -384,6 +385,10 @@ module.exports = function sanitizeResources (resources, context) {
       child = obj[resource.relativeUri] = obj[resource.relativeUri] || {};
     }
 
+    if(context.version == '1.0' && resource.selectedAnnotations && resource.selectedAnnotations.length){
+      sanitizeSelectedAnnotations(resource.selectedAnnotations, child);
+    }
+
     if (is.string(resource.displayName)) {
       child.displayName = resource.displayName;
     }
@@ -420,7 +425,7 @@ module.exports = function sanitizeResources (resources, context) {
   return obj;
 };
 
-},{"../utils/is":17,"./parameters":5,"./secured-by":11,"./trait":14,"xtend/mutable":26}],9:[function(require,module,exports){
+},{"../utils/is":17,"./parameters":5,"./secured-by":11,"./selected-annotations":13,"./trait":14,"xtend/mutable":26}],9:[function(require,module,exports){
 /**
  * Sanitize the responses object.
  *
