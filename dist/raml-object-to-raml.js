@@ -46,6 +46,7 @@ module.exports = function (dataTypes, context) {
 
 },{"../utils/is":17,"./parameters":5,"./responses":9,"./secured-by":11}],3:[function(require,module,exports){
 var is = require('../utils/is');
+var sanitizeSelectedAnnotations = require('./selected-annotations');
 
 /**
  * Sanitize documentation for RAML.
@@ -57,14 +58,18 @@ module.exports = function (documentation, context) {
   return documentation.filter(function (document) {
     return is.string(document.title) && is.string(document.content);
   }).map(function (document) {
-    return {
+    var doc = {
       title:   document.title,
       content: document.content
-    };
+    }
+    if(context.version == '1.0' && document.selectedAnnotations && document.selectedAnnotations.length){
+      sanitizeSelectedAnnotations(document.selectedAnnotations, doc);
+    }
+    return doc
   });
 };
 
-},{"../utils/is":17}],4:[function(require,module,exports){
+},{"../utils/is":17,"./selected-annotations":13}],4:[function(require,module,exports){
 var extend                  = require('xtend/mutable');
 var is                      = require('../utils/is');
 var sanitizeSchemas         = require('./schemas');
