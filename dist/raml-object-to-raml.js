@@ -504,6 +504,7 @@ module.exports = function (securedBy, context) {
 },{"../utils/is":17}],12:[function(require,module,exports){
 var is            = require('../utils/is');
 var sanitizeTrait = require('./trait');
+var sanitizeSelectedAnnotations = require('./selected-annotations');
 
 /**
  * Map of valid authentication types.
@@ -537,6 +538,10 @@ module.exports = function (securitySchemes, context) {
       var obj  = {};
       var data = obj[key] = { type: scheme.type };
 
+      if(context.version == '1.0' && scheme.selectedAnnotations && scheme.selectedAnnotations.length){
+        sanitizeSelectedAnnotations(scheme.selectedAnnotations, data);
+      }
+
       if (is.string(scheme.description)) {
         data.description = scheme.description;
       }
@@ -556,7 +561,7 @@ module.exports = function (securitySchemes, context) {
   return array;
 };
 
-},{"../utils/is":17,"./trait":14}],13:[function(require,module,exports){
+},{"../utils/is":17,"./selected-annotations":13,"./trait":14}],13:[function(require,module,exports){
 /**
  * Sanitize a annotationTypes-like object.
  *
