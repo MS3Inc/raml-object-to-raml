@@ -285,6 +285,7 @@ module.exports = function (protocols, context) {
 },{"../utils/is":17}],7:[function(require,module,exports){
 var is            = require('../utils/is');
 var sanitizeTrait = require('./trait');
+var sanitizeSelectedAnnotations = require('./selected-annotations')
 
 /**
  * Escape characters used inside a method name for the regexp.
@@ -318,6 +319,10 @@ module.exports = function (resourceTypes, context) {
       var child        = obj[type] = {};
       var resourceType = resourceTypeMap[type];
 
+      if(context.version == '1.0' && resourceType.selectedAnnotations && resourceType.selectedAnnotations.length){
+        sanitizeSelectedAnnotations(resourceType.selectedAnnotations, child);
+      }
+
       Object.keys(resourceType).forEach(function (key) {
         var value = resourceType[key];
         var keys  = ['type', 'usage', 'description'];
@@ -339,7 +344,7 @@ module.exports = function (resourceTypes, context) {
   return array;
 };
 
-},{"../utils/is":17,"./trait":14}],8:[function(require,module,exports){
+},{"../utils/is":17,"./selected-annotations":13,"./trait":14}],8:[function(require,module,exports){
 var extend             = require('xtend/mutable');
 var is                 = require('../utils/is');
 var sanitizeTrait      = require('./trait');
