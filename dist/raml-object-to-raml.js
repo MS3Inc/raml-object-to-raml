@@ -455,8 +455,9 @@ module.exports = function (responses, context) {
 
     if(context.version == '1.0' && responses[code].selectedAnnotations && responses[code].selectedAnnotations.length){
       sanitizeSelectedAnnotations(responses[code].selectedAnnotations, obj[code]);
-      delete obj[code].selectedAnnotations;
     }
+
+    delete obj[code].selectedAnnotations;
   });
 
   return obj;
