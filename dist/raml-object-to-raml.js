@@ -363,7 +363,7 @@ var sanitizeSelectedAnnotations = require('./selected-annotations');
  * @param  {Object} method
  * @return {Object}
  */
-var sanitizeMethods = function (methods) {
+var sanitizeMethods = function (methods, context) {
   var obj = {};
 
   methods.forEach(function (method) {
@@ -373,7 +373,7 @@ var sanitizeMethods = function (methods) {
       child.is = method.is;
     }
 
-    extend(child, sanitizeTrait(method));
+    extend(child, sanitizeTrait(method, context));
   });
 
   return obj;
@@ -436,6 +436,7 @@ module.exports = function sanitizeResources (resources, context) {
 };
 
 },{"../utils/is":17,"./parameters":5,"./secured-by":11,"./selected-annotations":13,"./trait":14,"xtend/mutable":26}],9:[function(require,module,exports){
+var sanitizeSelectedAnnotations = require('./selected-annotations');
 /**
  * Sanitize the responses object.
  *
@@ -451,12 +452,17 @@ module.exports = function (responses, context) {
     }
 
     obj[code] = responses[code];
+
+    if(context.version == '1.0' && responses[code].selectedAnnotations && responses[code].selectedAnnotations.length){
+      sanitizeSelectedAnnotations(responses[code].selectedAnnotations, obj[code]);
+      delete obj[code].selectedAnnotations;
+    }
   });
 
   return obj;
 };
 
-},{}],10:[function(require,module,exports){
+},{"./selected-annotations":13}],10:[function(require,module,exports){
 var is = require('../utils/is');
 
 /**
@@ -639,7 +645,7 @@ module.exports = function (traits, context) {
     Object.keys(traitMap).forEach(function (key) {
       var obj = {};
 
-      obj[key] = sanitizeTrait(traitMap[key]);
+      obj[key] = sanitizeTrait(traitMap[key], context);
 
       if(context.version == '1.0' && traitMap[key].selectedAnnotations && traitMap[key].selectedAnnotations.length){
         sanitizeSelectedAnnotations(traitMap[key].selectedAnnotations, obj[key]);
