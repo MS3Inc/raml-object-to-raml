@@ -588,6 +588,7 @@ var is                 = require('../utils/is');
 var sanitizeResponses  = require('./responses');
 var sanitizeParameters = require('./parameters');
 var sanitizeSecuredBy  = require('./secured-by');
+var sanitizeSelectedAnnotations = require('./selected-annotations');
 
 /**
  * Sanitize a trait-like object.
@@ -600,6 +601,10 @@ module.exports = function (trait, context) {
 
   if (is.string(trait.usage)) {
     obj.usage = trait.usage;
+  }
+
+  if(context.version == '1.0' && trait.selectedAnnotations && trait.selectedAnnotations.length){
+    sanitizeSelectedAnnotations(trait.selectedAnnotations, obj);
   }
 
   if (is.string(trait.description)) {
@@ -629,7 +634,7 @@ module.exports = function (trait, context) {
   return obj;
 };
 
-},{"../utils/is":17,"./parameters":5,"./responses":9,"./secured-by":11}],15:[function(require,module,exports){
+},{"../utils/is":17,"./parameters":5,"./responses":9,"./secured-by":11,"./selected-annotations":13}],15:[function(require,module,exports){
 var sanitizeTrait = require('./trait');
 var sanitizeSelectedAnnotations = require('./selected-annotations');
 
