@@ -340,6 +340,19 @@ describe('raml object to raml', function () {
       ].join('\n'))
     });
 
+    it('API selected Annotation Types', function(){
+      var str = toRAML({
+        selectedAnnotations : [{"CoolStaff":{"1":"hola1","2":"hola2"}},{"Small":"Small Value"}]
+      }, {version: '1.0'});
+      expect(str).to.equal([
+        RAML_PREFIX10,
+        '(CoolStaff):',
+        '  1: hola1',
+        '  2: hola2',
+        '(Small): Small Value'
+      ].join('\n'));
+    });
+
     it('resources', function () {
       var str = toRAML({
         resources: [{
