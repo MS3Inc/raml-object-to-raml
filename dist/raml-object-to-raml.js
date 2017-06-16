@@ -346,6 +346,16 @@ module.exports = function (resourceTypes, context) {
     });
   });
 
+  if (context.version == '1.0') {
+    var object = {}
+    array.forEach(function(rt) {
+      var name = Object.keys(rt)[0]
+      object[name] = rt[name];
+    }, this);
+
+    return object;
+  }
+
   return array;
 };
 
@@ -571,6 +581,16 @@ module.exports = function (securitySchemes, context) {
     });
   });
 
+  if (context.version == '1.0') {
+    var object = {}
+    array.forEach(function(schema) {
+      var name = Object.keys(schema)[0]
+      object[name] = schema[name];
+    }, this);
+
+    return object;
+  }
+
   return array;
 };
 
@@ -666,6 +686,17 @@ module.exports = function (traits, context) {
       array.push(obj);
     });
   });
+
+
+  if (context.version == '1.0') {
+    var object = {}
+    array.forEach(function(trait) {
+      var name = Object.keys(trait)[0]
+      object[name] = trait[name];
+    }, this);
+
+    return object;
+  }
 
   return array;
 };
