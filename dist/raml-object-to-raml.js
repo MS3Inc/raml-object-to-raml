@@ -658,7 +658,7 @@ module.exports = function (trait, context) {
   }
 
   if (is.array(trait.securedBy)) {
-    obj.securedBy = sanitizeSecuredBy(trait.securedBy, context)
+    obj.securedBy = sanitizeSecuredBy(trait.securedBy, context);
   }
 
   return obj;

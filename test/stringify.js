@@ -284,14 +284,59 @@ describe('raml object to raml', function () {
 
     it('Data types', function(){
       var str = toRAML({
-        types: [{Objecis: "!include /types/Objecis.yaml"}]
+        types: [{isObject: "!include /types/isObject.yaml"}, {"name":"Objecis","description":"Object description","example":"example Object","type":"object","properties":{"Property1":{"description":"property DEscription","maxLength":1,"minLength":1,"default":"1","example":"1","pattern":"1","type":"string","enum":["1Enum"]},"prop2":{"description":"description Prop2","minItems":88,"maxItems":88,"example":"example array","type":"array","unique":true,"items":{"minItems":99,"maxItems":99,"example":"examplearr2","type":"array","unique":false,"items":{"maximum":4,"minimum":4,"default":"numDefault","example":"nestedObjectExample","type":"object","format":"int64","enum":["enum1"],"properties":{"my1":{"description":"description","maxLength":1,"minLength":1,"default":"1","example":"1","pattern":"1","type":"string","enum":["enum1"]}}}}}}}]
 
       }, {version: '1.0'});
 
       expect(str).to.equal([
         RAML_PREFIX10,
         'types:',
-        '  Objecis: !include /types/Objecis.yaml',
+        '  isObject: !include /types/isObject.yaml',
+        '  Objecis:',
+        '    description: Object description',
+        '    example: example Object',
+        '    type: object',
+        '    properties:',
+        '      Property1:',
+        '        description: property DEscription',
+        '        maxLength: 1',
+        '        minLength: 1',
+        '        default: "1"',
+        '        example: "1"',
+        '        pattern: "1"',
+        '        type: string',
+        '        enum: [ 1Enum ]',
+        '      prop2:',
+        '        description: description Prop2',
+        '        minItems: 88',
+        '        maxItems: 88',
+        '        example: example array',
+        '        type: array',
+        '        unique: true',
+        '        items:',
+        '          minItems: 99',
+        '          maxItems: 99',
+        '          example: examplearr2',
+        '          type: array',
+        '          unique: false',
+        '          items:',
+        '            maximum: 4',
+        '            minimum: 4',
+        '            default: numDefault',
+        '            example: nestedObjectExample',
+        '            type: object',
+        '            format: int64',
+        '            enum: [ enum1 ]',
+        '            properties:',
+        '              my1:',
+        '                description: description',
+        '                maxLength: 1',
+        '                minLength: 1',
+        '                default: "1"',
+        '                example: "1"',
+        '                pattern: "1"',
+        '                type: string',
+        '                enum: [ enum1 ]',
 
 
       ].join('\n'))
