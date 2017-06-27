@@ -693,9 +693,9 @@ module.exports = function (traits, context) {
 
 
   if (context.version == '1.0') {
-    var object = {}
+    var object = {};
     array.forEach(function(trait) {
-      var name = Object.keys(trait)[0]
+      var name = Object.keys(trait)[0];
       object[name] = trait[name];
     }, this);
 
