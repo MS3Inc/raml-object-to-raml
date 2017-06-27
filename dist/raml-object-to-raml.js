@@ -13,7 +13,7 @@ module.exports = function (annotationTypes, context) {
     var annotationType = annotationTypes[i]
     var typeName = annotationType.name;
 
-    delete annotationType.name
+    delete annotationType.name;
     obj[typeName] = annotationType;
   }
   return obj;
@@ -35,11 +35,15 @@ var sanitizeSecuredBy  = require('./secured-by');
 module.exports = function (dataTypes, context) {
   var obj = {};
   for(var i=0, length = dataTypes.length; i < length; i++) {
-    var dataType = dataTypes[i]
-    var typeName = dataType.name;
-
-    delete dataType.name
-    obj[typeName] = dataType;
+    var dataType = dataTypes[i];
+    if (dataType.name) {
+      var typeName = dataType.name;
+      delete dataType.name;
+      obj[typeName] = dataType;
+    } else {
+      var typeName = Object.keys(dataType)[0];
+      obj[typeName] = dataType[typeName];
+    }
   }
   return obj;
 };
@@ -65,7 +69,7 @@ module.exports = function (documentation, context) {
     if(context.version == '1.0' && document.selectedAnnotations && document.selectedAnnotations.length){
       sanitizeSelectedAnnotations(document.selectedAnnotations, doc);
     }
-    return doc
+    return doc;
   });
 };
 
@@ -346,6 +350,16 @@ module.exports = function (resourceTypes, context) {
     });
   });
 
+  if (context.version == '1.0') {
+    var object = {};
+    array.forEach(function(rt) {
+      var name = Object.keys(rt)[0];
+      object[name] = rt[name];
+    }, this);
+
+    return object;
+  }
+
   return array;
 };
 
@@ -571,6 +585,16 @@ module.exports = function (securitySchemes, context) {
     });
   });
 
+  if (context.version == '1.0') {
+    var object = {};
+    array.forEach(function(schema) {
+      var name = Object.keys(schema)[0];
+      object[name] = schema[name];
+    }, this);
+
+    return object;
+  }
+
   return array;
 };
 
@@ -634,7 +658,7 @@ module.exports = function (trait, context) {
   }
 
   if (is.array(trait.securedBy)) {
-    obj.securedBy = sanitizeSecuredBy(trait.securedBy, context)
+    obj.securedBy = sanitizeSecuredBy(trait.securedBy, context);
   }
 
   return obj;
@@ -666,6 +690,17 @@ module.exports = function (traits, context) {
       array.push(obj);
     });
   });
+
+
+  if (context.version == '1.0') {
+    var object = {};
+    array.forEach(function(trait) {
+      var name = Object.keys(trait)[0];
+      object[name] = trait[name];
+    }, this);
+
+    return object;
+  }
 
   return array;
 };
