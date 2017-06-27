@@ -13,7 +13,7 @@ module.exports = function (annotationTypes, context) {
     var annotationType = annotationTypes[i]
     var typeName = annotationType.name;
 
-    delete annotationType.name
+    delete annotationType.name;
     obj[typeName] = annotationType;
   }
   return obj;
@@ -69,7 +69,7 @@ module.exports = function (documentation, context) {
     if(context.version == '1.0' && document.selectedAnnotations && document.selectedAnnotations.length){
       sanitizeSelectedAnnotations(document.selectedAnnotations, doc);
     }
-    return doc
+    return doc;
   });
 };
 
@@ -351,9 +351,9 @@ module.exports = function (resourceTypes, context) {
   });
 
   if (context.version == '1.0') {
-    var object = {}
+    var object = {};
     array.forEach(function(rt) {
-      var name = Object.keys(rt)[0]
+      var name = Object.keys(rt)[0];
       object[name] = rt[name];
     }, this);
 
@@ -586,9 +586,9 @@ module.exports = function (securitySchemes, context) {
   });
 
   if (context.version == '1.0') {
-    var object = {}
+    var object = {};
     array.forEach(function(schema) {
-      var name = Object.keys(schema)[0]
+      var name = Object.keys(schema)[0];
       object[name] = schema[name];
     }, this);
 
