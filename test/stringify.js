@@ -284,14 +284,14 @@ describe('raml object to raml', function () {
 
     it('Data types', function(){
       var str = toRAML({
-        types: [{Objecis: "!include /data-types/Objecis.yaml"}]
+        types: [{Objecis: "!include /types/Objecis.yaml"}]
 
       }, {version: '1.0'});
 
       expect(str).to.equal([
         RAML_PREFIX10,
         'types:',
-        '  Objecis: !include /data-types/Objecis.yaml',
+        '  Objecis: !include /types/Objecis.yaml',
 
 
       ].join('\n'))
