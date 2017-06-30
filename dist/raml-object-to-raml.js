@@ -103,6 +103,10 @@ module.exports = function (input, context) {
     output.title = input.title;
   }
 
+  if (is.string(input.usage)) {
+    output.usage = input.usage;
+  }
+
   if (is.string(input.version) || is.number(input.version)) {
     output.version = input.version;
   }
