@@ -107,6 +107,10 @@ module.exports = function (input, context) {
     output.usage = input.usage;
   }
 
+  if (is.string(input.extends)) {
+    output.extends = input.extends;
+  }
+
   if (is.object(input.uses)) {
     output.uses = input.uses
   }
