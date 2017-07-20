@@ -41,6 +41,28 @@ describe('raml object to raml', function () {
       ].join('\n'));
     });
 
+    it('usage', function () {
+      var str = toRAML({
+        usage: 'string'
+      });
+
+      expect(str).to.equal([
+        RAML_PREFIX,
+        'usage: string'
+      ].join('\n'));
+    });
+
+    it('extends', function () {
+      var str = toRAML({
+        extends: 'string'
+      });
+
+      expect(str).to.equal([
+        RAML_PREFIX,
+        'extends: string'
+      ].join('\n'));
+    });
+
     it('version', function () {
       var str = toRAML({
         version: 'v1.0'
