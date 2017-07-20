@@ -115,6 +115,10 @@ module.exports = function (input, context) {
     output.baseUri = input.baseUri;
   }
 
+  if (is.string(input.extends)) {
+    output.extends = input.extends;
+  }
+
   if(context.version == '1.0' && input.selectedAnnotations && input.selectedAnnotations.length){
     sanitizeSelectedAnnotations(input.selectedAnnotations, output);
   }
@@ -1202,7 +1206,7 @@ is.primitive = function (value) {
 },{}],18:[function(require,module,exports){
 'use strict';
 module.exports = function () {
-	return /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-PRZcf-nqry=><]/g;
+	return /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
 };
 
 },{}],19:[function(require,module,exports){
