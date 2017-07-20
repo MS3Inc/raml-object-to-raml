@@ -496,5 +496,15 @@ describe('raml object to raml', function () {
         '  get: {}'
       ].join('\n'))
     });
+
+    it('extends', function(){
+      var str = toRAML({
+        extends : "path/to/api.raml"
+      }, {version: '1.0'});
+      expect(str).to.equal([
+        RAML_PREFIX10,
+        'extends: path/to/api.raml'
+      ].join('\n'));
+    });
   });
 });
