@@ -87,7 +87,7 @@ var sanitizeSecuredBy       = require('./secured-by');
 var sanitizeProtocols       = require('./protocols');
 var sanitizeDataTypes       = require('./data-types');
 var sanitizeAnnotationTypes = require('./annotation-types');
-var sanitizeSelectedAnnotations = require('./selected-annotations')
+var sanitizeSelectedAnnotations = require('./selected-annotations');
 
 /**
  * Transform a RAML object into a YAML compatible structure.
@@ -101,6 +101,18 @@ module.exports = function (input, context) {
 
   if (is.string(input.title)) {
     output.title = input.title;
+  }
+
+  if (is.string(input.usage)) {
+    output.usage = input.usage;
+  }
+
+  if (is.string(input.extends)) {
+    output.extends = input.extends;
+  }
+
+  if (is.object(input.uses)) {
+    output.uses = input.uses
   }
 
   if (is.string(input.version) || is.number(input.version)) {
@@ -1206,7 +1218,7 @@ is.primitive = function (value) {
 },{}],18:[function(require,module,exports){
 'use strict';
 module.exports = function () {
-	return /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
+	return /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-PRZcf-nqry=><]/g;
 };
 
 },{}],19:[function(require,module,exports){
