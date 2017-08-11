@@ -558,7 +558,8 @@ var AUTH_TYPES = {
   'Basic Authentication':  true,
   'Digest Authentication': true,
   'OAuth 1.0':             true,
-  'OAuth 2.0':             true
+  'OAuth 2.0':             true,
+  'Pass Through':          true
 };
 
 /**
