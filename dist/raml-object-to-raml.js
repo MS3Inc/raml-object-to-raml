@@ -668,6 +668,15 @@ module.exports = function (trait, context) {
 
   if (is.object(trait.body)) {
     obj.body = trait.body;
+    for (var key in obj.body) {
+      if (obj.body.hasOwnProperty(key)) {
+        var el = obj.body[key];
+        if (el.selectedAnnotations && el.selectedAnnotations.length) {
+          sanitizeSelectedAnnotations(el.selectedAnnotations, el);
+          delete el.selectedAnnotations
+        }
+      }
+    }
   }
 
   if (is.object(trait.responses)) {
