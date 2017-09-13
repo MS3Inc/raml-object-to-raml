@@ -528,5 +528,16 @@ describe('raml object to raml', function () {
         'extends: path/to/api.raml'
       ].join('\n'));
     });
+
+    it('doesnt put on multiple lines long(longer than 80 symbols) include strings', function(){
+      var str = toRAML({
+        schemas: [ {VeryVeryExtraBigOneSchema123123123123: '!include schemas/VeryVeryExtraBigOneSchema123123123123.json'}]
+      }, {version: '1.0'});
+      expect(str).to.equal([
+        RAML_PREFIX10,
+        'schemas:',
+        '  - VeryVeryExtraBigOneSchema123123123123: !include schemas/VeryVeryExtraBigOneSchema123123123123.json'
+      ].join('\n'));
+    });
   });
 });
