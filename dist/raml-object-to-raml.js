@@ -107,6 +107,10 @@ module.exports = function (input, context) {
     output.usage = input.usage;
   }
 
+  if (is.string(input.description)) {
+    output.description = input.description;
+  }
+  
   if (is.string(input.extends)) {
     output.extends = input.extends;
   }
@@ -205,6 +209,19 @@ var TYPES = {
 };
 
 /**
+ * Check if type is valid (including arrays).
+ *
+ * @param  {String} type
+ */
+function isValidType (type) {
+  if (TYPES.hasOwnProperty(type)) return true;
+  
+  var typeName = type.match(/(.+)\[\]$/);
+  typeName = typeName && typeName.length ? typeName[1] : typeName;
+  return TYPES.hasOwnProperty(typeName);
+}
+
+/**
  * Sanitize a single parameter representation.
  *
  * @param  {Object} param
@@ -219,7 +236,7 @@ var sanitizeParameter = function (param, key) {
     obj.displayName = param.displayName;
   }
 
-  if (is.string(param.type) && TYPES.hasOwnProperty(param.type)) {
+  if (is.string(param.type) && isValidType(param.type)) {
     obj.type = param.type;
   }
 
@@ -251,11 +268,11 @@ var sanitizeParameter = function (param, key) {
     obj.maximum = param.maximum;
   }
 
-  if (param.example != null && is.primitive(param.example)) {
+  if (param.example != null) {
     obj.example = param.example;
   }
 
-  if (param.default != null && is.primitive(param.default)) {
+  if (param.default != null) {
     obj.default = param.default;
   }
 
@@ -346,6 +363,10 @@ module.exports = function (resourceTypes, context) {
 
       if(context.version == '1.0' && resourceType.selectedAnnotations && resourceType.selectedAnnotations.length){
         sanitizeSelectedAnnotations(resourceType.selectedAnnotations, child);
+      }
+
+      if (is.array(resourceType.is)) {
+        child.is = resourceType.is;
       }
 
       Object.keys(resourceType).forEach(function (key) {
@@ -865,6 +886,14 @@ var stringIsInclude = function (str) {
 }
 
 /**
+ * Check if string is a RAML array
+ * @param {String} str
+ */
+var stringIsArray = function (str) {
+  return /^[A-Z]+\[\]$/i.test(str);
+}
+
+/**
  * Check whether a string requires quotes in RAML.
  *
  * @param  {String}  str
@@ -880,8 +909,12 @@ var requiresQuotes = function (str) {
       return false;
   }
 
+  if (stringIsArray(str)) {
+    return false;
+  }
+
   // Check whether it's surrounded by spaces or starts with `-` or `?`.
-  if (/^[ \-?]| $/.test(str) || NUMBER_REGEXP.test(str)) {
+  if (/^[ \-?]| $/.test(str.trim()) || NUMBER_REGEXP.test(str)) {
     return true;
   }
 
@@ -1235,7 +1268,7 @@ is.primitive = function (value) {
 },{}],18:[function(require,module,exports){
 'use strict';
 module.exports = function () {
-	return /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-PRZcf-nqry=><]/g;
+	return /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
 };
 
 },{}],19:[function(require,module,exports){
